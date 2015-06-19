@@ -31,19 +31,19 @@ class User{
 			echo ' <br />';
 			
 			if ($count == 1) {
+				echo "Welcome back, ".$this->login." <br />";
+				
 				session_start();
 				$cookie_name = 'Username';
 				$cookie_value = $this->login;
 				
-				header('Location: index.php');
-				setcookie ( "Username", $cookie_value, time () + (86400 * 30), "/php/hw11/" ); // 86400 = 1 day
+				
+				setcookie ( "Username", $cookie_value, time () + (86400 * 30), "/" ); // 86400 = 1 day
 				
 				if (isset ( $_COOKIE ["$cookie_name"] )) {
 					echo "redirecting";
-					
-					header ( "Location: index.php" );
+					header('Location: index.php');
 				}
-				echo "Welcome " . $this->login;
 				$sql = "UPDATE users
 					SET	 update_at= '" . $this->login_date . "'
 					Where `login` = '" . $this->login . "'";
@@ -103,7 +103,7 @@ class User{
 				if ($result) {
 					echo "Welcome <br />";
 					mail ( $this->email, "Сообщение с сайта " . $_SERVER ['SERVER_NAME'], "Приветствуем Вас на сайте " . $_SERVER ['SERVER_NAME'] );
-					echo "Email has been sent to " . $this->email . "<br /> Now you can <a href='login.php'>log in</a>";
+					echo "Email has been sent to " . $this->email . "<br /> Now you can <a href='login.php'>log in</a><br />";
 				} else {
 					echo "Error: " . $sql . "<br>" . $conn->error;
 				}
