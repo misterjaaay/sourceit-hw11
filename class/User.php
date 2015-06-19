@@ -103,7 +103,7 @@ class User{
 				if ($result) {
 					echo "Welcome <br />";
 					mail ( $this->email, "Сообщение с сайта " . $_SERVER ['SERVER_NAME'], "Приветствуем Вас на сайте " . $_SERVER ['SERVER_NAME'] );
-					echo "Email has been set to " . $this->email . "<br /> Now you can <a href='login.php'>log in</a>";
+					echo "Email has been sent to " . $this->email . "<br /> Now you can <a href='login.php'>log in</a>";
 				} else {
 					echo "Error: " . $sql . "<br>" . $conn->error;
 				}
