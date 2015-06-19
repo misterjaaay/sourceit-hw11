@@ -7,11 +7,11 @@ class User{
 	public $password;
 	public $login_date;
 	// UserRegister vars
-// 	public $new_login;
-// 	public $email;
-// 	public $new_password;
-// 	public $r_password;
-// 	public $registration_date;
+	public $new_login;
+	public $email;
+	public $new_password;
+	public $r_password;
+	public $registration_date;
 	
 	public function UserLogin() {
 		$this->login = trim ( $_POST ['login'] );
@@ -31,12 +31,16 @@ class User{
 			echo ' <br />';
 			
 			if ($count == 1) {
+				session_start();
 				$cookie_name = 'Username';
 				$cookie_value = $this->login;
 				
 				header('Location: index.php');
 				setcookie ( "Username", $cookie_value, time () + (86400 * 30), "/php/hw11/" ); // 86400 = 1 day
+				
 				if (isset ( $_COOKIE ["$cookie_name"] )) {
+					echo "redirecting";
+					
 					header ( "Location: index.php" );
 				}
 				echo "Welcome " . $this->login;
@@ -52,39 +56,39 @@ class User{
 	}
 	
 	public function UserRegister() {
-		$new_login = trim ( $_POST ['new_login'] );
-		$email = trim ( $_POST ['email'] );
-		$new_password = trim ( $_POST ['new_password'] );
-		$r_password = trim ( $_POST ['new_r_password'] );
-		$registration_date = date ( "Y:m:d h:m:s" );
+		$this->new_login = trim ( $_POST ['new_login'] );
+		$this->email = trim ( $_POST ['email'] );
+		$this->new_password = trim ( $_POST ['new_password'] );
+		$this->r_password = trim ( $_POST ['new_r_password'] );
+		$this->registration_date = date ( "Y:m:d h:m:s" );
 		
-		$new_login = stripslashes ( $new_login );
-		$email = stripslashes ( $email );
-		$new_password = stripslashes ( $new_password );
-		$r_password = stripslashes ( $r_password );
-		$new_login = mysql_real_escape_string ( $new_login );
-		$email = mysql_real_escape_string ( $email );
-		$new_password = mysql_real_escape_string ( $new_password );
-		$r_password = mysql_real_escape_string ( $r_password );
+		$this->new_login = stripslashes ( $this->new_login );
+		$this->email = stripslashes ( $this->email );
+		$this->new_password = stripslashes ( $this->new_password );
+		$this->r_password = stripslashes ( $this->r_password );
+		$this->new_login = mysql_real_escape_string ( $this->new_login );
+		$this->email = mysql_real_escape_string ( $this->email );
+		$this->new_password = mysql_real_escape_string ( $this->new_password );
+		$this->r_password = mysql_real_escape_string ( $this->r_password );
 		
 		if (isset ( $_POST ['register'] )) {
 			$registerUserConnection = new ConnectToDb ();
 			
-			if ($new_password === $r_password) {
-				$new_password = sha1 ( 'ololo' . $new_password );
+			if ($this->new_password === $this->r_password) {
+				$this->new_password = sha1 ( 'ololo' . $this->new_password );
 			} else {
 				exit ("passwords do not match");
 			}
 			
-			if (! (filter_var ( $email, FILTER_VALIDATE_EMAIL ))) {
-				exit ("This ($email) email address is not valid.");
+			if (! (filter_var ( $this->email, FILTER_VALIDATE_EMAIL ))) {
+				exit ("This ($this->email) email address is not valid.");
 			}
 			
-			if (! preg_match ( "#^[A-Za-z0-9]+$#", $new_login )) {
+			if (! preg_match ( "#^[A-Za-z0-9]+$#", $this->new_login )) {
 				exit("Please use letters or digits");
 			}
 			
-			$sql = "SELECT * FROM users WHERE `email` = '{$email}' OR `login` = '{$new_login}'";
+			$sql = "SELECT * FROM users WHERE `email` = '{$this->email}' OR `login` = '{$this->new_login}'";
 			$result = $registerUserConnection->sqlQuery ( $sql );
 			
 			$count = mysqli_num_rows ( $result );
@@ -93,24 +97,24 @@ class User{
 				exit ("USER OR EMAIL is occupied");
 			} else {
 				$sql = "INSERT INTO users(login, password, email, create_at )
-					 VALUES ('" . $new_login . "','" . $new_password . "', '" . $email . "', '" . $registration_date . "')";
+					 VALUES ('" . $this->new_login . "','" . $this->new_password . "', '" . $this->email . "', '" . $this->registration_date . "')";
 				$result = $registerUserConnection->sqlQuery ( $sql );
 				
 				if ($result) {
 					echo "Welcome <br />";
-					mail ( $email, "Сообщение с сайта " . $_SERVER ['SERVER_NAME'], "Приветствуем Вас на сайте " . $_SERVER ['SERVER_NAME'] );
-					echo "Email has been set to " . $email . "<br /> Now you can <a href='login.php'>log in</a>";
+					mail ( $this->email, "Сообщение с сайта " . $_SERVER ['SERVER_NAME'], "Приветствуем Вас на сайте " . $_SERVER ['SERVER_NAME'] );
+					echo "Email has been set to " . $this->email . "<br /> Now you can <a href='login.php'>log in</a>";
 				} else {
 					echo "Error: " . $sql . "<br>" . $conn->error;
 				}
 			}
 		}
 	}
-	
 	public function logoutUser() {
 		if (isset ( $_POST ['logout'] )){
-			
-			echo 11;
+			session_unset();
+			session_destroy();
+			setcookie ( "PHPSESSID", "", time () -3600);
 		}
 	}
 }
